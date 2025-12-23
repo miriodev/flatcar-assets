@@ -1,0 +1,182 @@
+name: Check for new / missing upstream releases and dispatch builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'branch to build'
+        type: string
+        required: false
+        default: 'main'
+
+jobs:
+  list-builds:
+    runs-on: ubuntu-24.04
+    outputs:
+      builds: ${{ steps.list.outputs.builds }}
+      extensions: ${{ steps.list.outputs.extensions }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: list
+        id: list
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release_dispatcher.sh
+
+  create-release:
+    needs: list-builds
+    if: ${{ needs.list-builds.outputs.builds != '[]' && needs.list-builds.outputs.builds != '' }}
+    strategy:
+      matrix:
+        release: ${{ fromJson(needs.list-builds.outputs.builds) }}
+    # Try to finish all jobs even if one fails.
+    # Job fails can be transient and will be re-tried every time this action runs.
+    # NOTE that this will cause succeeding jobs (update metadata) to run even if the whole matrix fails.
+    #      This is intended and should not cause any issues[tm].
+    continue-on-error: true 
+
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      - name: Set up qemu / binmft misc for cross-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Check out the bakery repo
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: build
+        id: build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release.sh ${{ matrix.release }}
+
+      - name: create a new release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: false
+          tag_name: ${{ steps.build.outputs.tag }}
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS
+            bakery/*.raw
+            bakery/*.conf
+            bakery/*-build.log
+
+  update-extension-metadata:
+    needs: [ list-builds, create-release ]
+    if: ${{ needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
+    strategy:
+      matrix:
+        extension: ${{ fromJson(needs.list-builds.outputs.extensions) }}
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: Fetch extension release metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release_meta.sh ${{ matrix.extension }}
+
+      - name: create new metadata release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: false
+          tag_name: ${{ matrix.extension }}
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS
+            bakery/*.conf
+
+  update-global-metadata:
+    needs: update-extension-metadata
+    if: ${{ needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: Fetch all extension releases metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release_meta.sh
+
+      - name: create new metadata release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: true
+          tag_name: SHA256SUMS
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS
