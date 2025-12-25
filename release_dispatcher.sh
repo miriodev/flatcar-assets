@@ -36,11 +36,6 @@ for image in "${images[@]}"; do
   for v in "${version[@]}"; do
     echo -n "*  ${extension} ${v}: "
 
-    if github_release_exists "${bakery%/*}" "${bakery#*/}" "${extension}-${v}"; then
-      echo "Bakery release exists."
-      continue
-    fi
-
     if [[ " ${builds[@]} " != *" ${extension}:${v} "* ]] ; then
       echo "Build required. "
       build_required="true"
