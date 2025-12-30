@@ -1,5 +1,32 @@
 -D
 -b 8192
+-a (always,exit|exit,always) -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change
+-a (always,exit|exit,always) -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b32 -S clock_settime -k time-change
+-a (always,exit|exit,always) -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a (always,exit|exit,always) -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a (always,exit|exit,always) -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts
+-a (always,exit|exit,always) -F arch=b32 -S sethostname -S setdomainname -k system-locale
+-a (always,exit|exit,always) -F arch=b32 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b32 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete
+-a (always,exit|exit,always) -F arch=b64 -S adjtimex -S settimeofday -k time-change
+-a (always,exit|exit,always) -F arch=b64 -S adjtimex -S settimeofday -S stime -k time-change
+-a (always,exit|exit,always) -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S clock_settime -k time-change
+-a (always,exit|exit,always) -F arch=b64 -S clock_settime -k time-change
+-a (always,exit|exit,always) -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a (always,exit|exit,always) -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a (always,exit|exit,always) -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a (always,exit|exit,always) -F arch=b64 -S init_module -S delete_module -k modules
+-a (always,exit|exit,always) -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts
+-a (always,exit|exit,always) -F arch=b64 -S sethostname -S setdomainname -k system-locale
+-a (always,exit|exit,always) -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a (always,exit|exit,always) -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete
 -a always,exit -F arch=b32 -F euid=0 -F auid>=1000 -F auid!=-1 -S execve -k rootcmd
 -a always,exit -F arch=b32 -F exe=/bin/bash -F success=1 -S connect -k remote_shell
 -a always,exit -F arch=b32 -F exe=/usr/bin/bash -F success=1 -S connect -k remote_shell
@@ -74,7 +101,6 @@
 -a always,exit -F arch=b32 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=-1 -k delete
 -a always,exit -F arch=b32 -S semctl -k Inter-Process_Communication
 -a always,exit -F arch=b32 -S semget -k Inter-Process_Communication
--a always,exit -F arch=b32 -S sethostname,setdomainname -F key=audit_rules_networkconfig_modification
 -a always,exit -F arch=b32 -S sethostname -S setdomainname -k network_modifications
 -a always,exit -F arch=b32 -S settimeofday -F key=audit_time_rules
 -a always,exit -F arch=b32 -S setxattr -F auid=0 -F key=perm_mod
@@ -95,10 +121,8 @@
 -a always,exit -F arch=b64 -F path=/usr/local/bin/dact -F perm=x -F key=Data_Compressed
 -a always,exit -F arch=b64 -F path=/usr/sbin/dact -F perm=x -F key=Data_Compressed
 -a always,exit -F arch=b64 -F path=/usr/sbin/gzexe -F perm=x -F key=Data_Compressed
--a always,exit -F arch=b64 -S adjtimex -F key=audit_time_rules
 -a always,exit -F arch=b64 -S chmod  -F auid>=1000 -F auid!=-1 -k perm_mod
 -a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=-1 -k perm_mod
--a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -F key=time-change
 -a always,exit -F arch=b64 -S connect -F a2=16 -F success=1 -F key=network_connect_4
 -a always,exit -F arch=b64 -S connect -F a2=28 -F success=1 -F key=network_connect_6
 -a always,exit -F arch=b64 -S create_module -F key=module-change
@@ -178,45 +202,44 @@
 -a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=unset -F key=access
 -a always,exit -F arch=b64 -S unlinkat -F auid>=1000 -F auid!=unset -F key=delete
 -a always,exit -F arch=b64 -S unlink -F auid>=1000 -F auid!=unset -F key=delete
-#-a always,exit -F dir=/etc/NetworkManager/ -F perm=wa -k network_modifications
 -a always,exit -F dir=/home -F uid=0 -F auid>=1000 -F auid!=-1 -C auid!=obj_uid -k power_abuse
 -a always,exit -F path=/sbin/mount.nfs -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
 -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/mount -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/pkexec -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/umount -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/bin/write -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/libexec/sssd/krb5_child -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
 -a always,exit -F path=/usr/libexec/sssd/ldap_child -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
 -a always,exit -F path=/usr/libexec/sssd/p11_child -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
 -a always,exit -F path=/usr/libexec/sssd/proxy_child -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
 -a always,exit -F path=/usr/libexec/sssd/selinux_child -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
+-a always,exit -F path=/usr/lib/polkit-1/polkit-agent-helper-1 -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/sbin/aulast -F perm=x -k audittools
 -a always,exit -F path=/usr/sbin/aulastlogin -F perm=x -k audittools
 -a always,exit -F path=/usr/sbin/aureport -F perm=x -k audittools
 -a always,exit -F path=/usr/sbin/ausearch -F perm=x -k audittools
 -a always,exit -F path=/usr/sbin/auvirt -F perm=x -k audittools
+-a always,exit -F path=/usr/sbin/grub2-set-bootflag -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/sbin/mount.nfs -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/sbin/mount.nfs -F perm=x -F auid>=500 -F auid!=4294967295 -k T1078_Valid_Accounts
+-a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
+-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a always,exit -F perm=x -F auid!=-1 -F path=/sbin/insmod -k modules
 -a always,exit -F perm=x -F auid!=-1 -F path=/sbin/modprobe -k modules
 -a always,exit -F perm=x -F auid!=-1 -F path=/sbin/rmmod -k modules
--a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/sbin/grub2-set-bootflag -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/sbin/mount.nfs -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/umount -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/write -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/pkexec -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/mount -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
--a always,exit -F path=/usr/lib/polkit-1/polkit-agent-helper-1 -F perm=x -F auid>=1000 -F auid!=unset -F key=privileged
 -a never,exit -F arch=b32 -F dir=/dev/shm/ -F key=sharedmemaccess
 -a never,exit -F arch=b32 -F dir=/var/lock/lvm/ -F key=locklvm
 -a never,exit -F arch=b64 -F dir=/dev/shm/ -F key=sharedmemaccess
@@ -267,27 +290,20 @@
 -w /etc/docker -k docker
 -w /etc/exim4/ -p wa -k mail
 -w /etc/fish/ -p wa -k shell_profiles
--w /etc/group -p wa -k audit_rules_usergroup_modification
--w /etc/group -p wa -k etcgroup
--w /etc/gshadow -k etcgroup
--w /etc/gshadow -p wa -k audit_rules_usergroup_modification
+-w /etc/group -p wa -k identity
+-w /etc/gshadow -p wa -k identity
 -w /etc/hostname -p r -k recon
--w /etc/hosts -p wa -k audit_rules_networkconfig_modification
--w /etc/hosts -p wa -k network_modifications
+-w /etc/hosts -p wa -k system-locale
 -w /etc/init.d/ -p wa -k init
 -w /etc/init/ -p wa -k init
 -w /etc/inittab -p wa -k init
--w /etc/issue.net -p wa -k audit_rules_networkconfig_modification
--w /etc/issue.net -p wa -k etcissue
--w /etc/issue -p r -k recon
--w /etc/issue -p wa -k audit_rules_networkconfig_modification
--w /etc/issue -p wa -k etcissue
+-w /etc/issue.net -p wa -k system-locale
+-w /etc/issue -p wa -k system-locale
 -w /etc/ld.so.conf.d -p wa -k libpath
 -w /etc/ld.so.conf -p wa -k libpath
 -w /etc/ld.so.preload -p wa -k systemwide_preloads
 -w /etc/libaudit.conf -p wa -k auditconfig
--w /etc/localtime -p wa -k audit_time_rules
--w /etc/localtime -p wa -k localtime
+-w /etc/localtime -p wa -k time-change
 -w /etc/login.defs -p wa -k login
 -w /etc/modprobe.conf -p wa -k modprobe
 -w /etc/modprobe.d -p wa -k modprobe
@@ -299,8 +315,7 @@
 -w /etc/pam.conf -p wa -k audit_rules_usergroup_modification
 -w /etc/pam.d/ -p wa -k audit_rules_usergroup_modification
 -w /etc/pam.d/ -p wa -k pam
--w /etc/passwd -p wa -k audit_rules_usergroup_modification
--w /etc/passwd -p wa -k etcpasswd
+-w /etc/passwd -p wa -k identity
 -w /etc/postfix/ -p wa -k mail
 -w /etc/profile.d/ -p wa -k shell_profiles
 -w /etc/profile -p wa -k shell_profiles
@@ -310,22 +325,19 @@
 -w /etc/security/namespace.conf -p wa -k pam
 -w /etc/security/namespace.d -p wa -k pam
 -w /etc/security/namespace.init -p wa -k pam
--w /etc/security/opasswd -k opasswd
--w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification
+-w /etc/security/opasswd -p wa -k identity
 -w /etc/security/pam_env.conf -p wa -k pam
 -w /etc/selinux/ -p wa -k mac_policy
 -w /etc/selinux/ -p wa -k MAC-policy
--w /etc/shadow -k etcpasswd
--w /etc/shadow -p wa -k audit_rules_usergroup_modification
+-w /etc/shadow -p wa -k identity
 -w /etc/shells -p wa -k shell_profiles
 -w /etc/ssh/sshd_config.d -k sshd
 -w /etc/ssh/sshd_config -k sshd
--w /etc/sudoers.d/ -p wa -k actions
--w /etc/sudoers -p wa -k actions
+-w /etc/sudoers.d/ -p wa -k scope
+-w /etc/sudoers -p wa -k scope
 -w /etc/sysconfig/docker -k docker
 -w /etc/sysconfig/docker-storage -k docker
--w /etc/sysconfig/network -p wa -k audit_rules_networkconfig_modification
--w /etc/sysconfig/network -p wa -k network_modifications
+-w /etc/sysconfig/network -p wa -k system-locale
 -w /etc/sysconfig/network-scripts -p wa -k audit_rules_networkconfig_modification_network_scripts
 -w /etc/sysconfig/network-scripts -p w -k network_modifications
 -w /etc/sysctl.conf -p wa -k sysctl
@@ -343,10 +355,13 @@
 -w /sbin/auditd -p x -k audittools
 -w /sbin/halt -p x -k power
 -w /sbin/ifconfig -p x -k sbin_susp
+-w /sbin/insmod -p x -k modules
 -w /sbin/ip6tables -p x -k sbin_susp
 -w /sbin/iptables -p x -k sbin_susp
+-w /sbin/modprobe -p x -k modules
 -w /sbin/poweroff -p x -k power
 -w /sbin/reboot -p x -k power
+-w /sbin/rmmod -p x -k modules
 -w /sbin/shutdown -p x -k power
 -w /sbin/xtables-nft-multi -p x -k sbin_susp
 -w /sbin/yast2 -p x -k software_mgmt
@@ -491,15 +506,13 @@
 -w /var/audit/ -p wra -k auditlog
 -w /var/lib/docker -p wa -k docker
 -w /var/log/audit/ -p wra -k auditlog
--w /var/log/btmp -p wa -k session
--w /var/log/faillog -p wa -k login
--w /var/log/lastlog -p wa -k login
+-w /var/log/btmp -p wa -k logins
+-w /var/log/faillog -p wa -k logins
 -w /var/log/lastlog -p wa -k logins
--w /var/log/sudo.log -p wa -k maintenance
--w /var/log/tallylog -p wa -k login
--w /var/log/wtmp -p wa -k session
+-w /var/log/sudo.log -p wa -k actions
+-w /var/log/tallylog -p wa -k logins
+-w /var/log/wtmp -p wa -k logins
 -w /var/run/faillock -p wa -k logins
 -w /var/run/utmp -p wa -k session
 -w /var/spool/cron/ -p wa -k cron
-
 -e 2
