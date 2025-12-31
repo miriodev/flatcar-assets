@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # vim: et ts=2 syn=bash
 #
-# CloudflareD system extension.
+# Aide system extension.
 #
 
 RELOAD_SERVICES_ON_MERGE="true"
@@ -20,7 +20,7 @@ function populate_sysext_root() {
   local rel_arch="$(arch_transform 'x86-64' 'amd64' "$arch")"
   curl -o aide -fsSL https://github.com/miriodev/flatcar-assets/releases/download/aide-${version}/aide
   mkdir -p "${sysextroot}/usr/local/bin/"
-  cp -a cloudflared "${sysextroot}/usr/local/bin/"
+  cp -a aide "${sysextroot}/usr/local/bin/"
   chmod +x "${sysextroot}/usr/local/bin/aide"
 
 
