@@ -1,0 +1,59 @@
+variant: flatcar
+version: 1.0.0
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: k3s.service
+      enabled: true
+    - name: iptables-restore.service
+      enabled: true
+    - name: ip6tables-restore.service
+      enabled: true
+    - name: ntpd.service
+      enabled: true
+    - name: debug-shell.service
+      enabled: false
+      mask: true
+    - name: debug-shell.socket
+      enabled: false
+      mask: true
+    - name: ctrl-alt-del.target
+      mask: true
+    - name: bluetooth.service
+      enabled: false
+      mask: true
+    - name: bluetooth.socket
+      enabled: false
+      mask: true
+    - name: autofs.service
+      enabled: false
+      mask: true
+    - name: autofs.socket
+      enabled: false
+      mask: true
+storage:
+  files:
+    - path: /etc/securetty
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: ""
+    - path: /etc/modprobe.d/blacklist.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          blacklist usb-storage
+    - path: /etc/issue
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          Authorized users only. All activity may be monitored and reported.
+    - path: /etc/issue.net
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          Authorized users only. All activity may be monitored and reported.
