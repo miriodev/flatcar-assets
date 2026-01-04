@@ -32,7 +32,20 @@ systemd:
     - name: autofs.socket
       enabled: false
       mask: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: k3s.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C k3s-v1.33 update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/k3s /tmp/k3s-new; then touch /run/reboot-required; fi"
 storage:
+  links:
+    - path: /etc/extensions/docker-flatcar.raw
+      target: /dev/null
+      overwrite: true
   files:
     - path: /etc/securetty
       mode: 0644
@@ -51,9 +64,38 @@ storage:
       contents:
         inline: |
           Authorized users only. All activity may be monitored and reported.
+
     - path: /etc/issue.net
       overwrite: true
       mode: 0644
       contents:
         inline: |
           Authorized users only. All activity may be monitored and reported.
+
+    - path: /etc/security/limits.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        source: https://raw.githubusercontent.com/miriodev/flatcar-assets/main/config/limits.conf
+    - path: /etc/sysctl.d/bulk.conf
+      mode: 0644
+      contents:
+        source: https://raw.githubusercontent.com/miriodev/flatcar-assets/main/config/sysctl.conf
+    - path: /etc/ntp.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+          restrict default nomodify nopeer noquery notrap limited kod
+          restrict 127.0.0.1
+    - path: /etc/passwd-
+      mode: 0600
+    - path: /etc/gshadow-
+      mode: 0600
+      user:
+        name: root
+    - path: /etc/group-
+      mode: 0600
+      user:
+        name: root
