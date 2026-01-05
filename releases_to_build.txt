@@ -3,3 +3,5 @@ cloudflared 2025.11.1
 k3s v1.33.4+k3s1
 
 aide 0.19.2
+
+helm v4.0.4
