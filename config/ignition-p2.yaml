@@ -52,6 +52,64 @@ storage:
       overwrite: true
       contents:
         inline: ""
+    - path: /etc/audit/rules.d/99-auditsec.rules
+      overwrite: true
+      mode: 0644
+      contents:
+        source: https://raw.githubusercontent.com/miriodev/flatcar-assets/main/config/auditd-sec.rules
+    - path: /etc/default/useradd
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          GROUP=100
+          HOME=/home
+          INACTIVE=30
+          EXPIRE=
+          SHELL=/bin/bash
+          SKEL=/etc/skel
+    - path: /etc/selinux/config
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          # This file controls the state of SELinux on the system on boot.
+          SELINUX=enforcing
+          SELINUXTYPE=mcs
+    - path: /boot/boot/grub/menu.lst
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          audit=1
+          timeout 0
+          title   CoreOS GRUB2
+          root    (hd0,0)
+          kernel  /xen/pvboot-x86_64.elf
+    - path: /opt/extensions/k3s/k3s-v1.33.4+k3s1-x86-64.raw
+      mode: 0644
+      contents:
+        source: https://github.com/miriodev/flatcar-assets/releases/download/k3s-v1.33.4%2Bk3s1/k3s-v1.33.4+k3s1-x86-64.raw
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://extensions.flatcar.org/extensions/noop.conf
+    - path: /opt/extensions/helm/helm.raw
+      mode: 0644
+      contents:
+        source: https://github.com/miriodev/flatcar-assets/releases/download/helm-v4.0.4/helm-v4.0.4-x86-64.raw
+    - path: /opt/extensions/cloudflared/cloudflared.raw
+      mode: 0644
+      contents:
+        source: https://github.com/miriodev/flatcar-assets/releases/download/cloudflared-2025.11.1/cloudflared-2025.11.1-x86-64.raw
+    - path: /opt/extensions/aide/aide.raw
+      mode: 0644
+      contents:
+        source: https://github.com/miriodev/flatcar-assets/releases/download/aide-0.19.2/aide-0.19.2-x86-64.raw
+    - contents:
+        source: data:,CtrlAltDelBurstAction%3Dnone
+      mode: 0644
+      path: /etc/systemd/system.conf.d/disable_ctrlaltdelete_burstaction.conf
+      overwrite: true
     - path: /etc/modprobe.d/blacklist.conf
       overwrite: true
       mode: 0644
