@@ -2,8 +2,6 @@ variant: flatcar
 version: 1.0.0
 systemd:
   units:
-    - name: systemd-sysupdate.timer
-      enabled: true
     - name: k3s.service
       enabled: true
     - name: iptables-restore.service
@@ -32,15 +30,6 @@ systemd:
     - name: autofs.socket
       enabled: false
       mask: true
-    - name: systemd-sysupdate.service
-      dropins:
-        - name: k3s.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C k3s-v1.33 update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/k3s /tmp/k3s-new; then touch /run/reboot-required; fi"
 storage:
   links:
     - path: /etc/extensions/docker-flatcar.raw
@@ -86,10 +75,10 @@ storage:
           title   CoreOS GRUB2
           root    (hd0,0)
           kernel  /xen/pvboot-x86_64.elf
-    - path: /opt/extensions/k3s/k3s-v1.33.4+k3s1-x86-64.raw
+    - path: /opt/extensions/k3s/k3s-v1.34.3+k3s1-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/miriodev/flatcar-assets/releases/download/k3s-v1.33.4%2Bk3s1/k3s-v1.33.4+k3s1-x86-64.raw
+        source: https://github.com/miriodev/flatcar-assets/releases/download/k3s-v1.34.3%2Bk3s1/k3s-v1.34.3+k3s1-x86-64.raw
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
