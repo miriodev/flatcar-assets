@@ -1,8 +1,9 @@
-cloudflared 2025.11.1
+cloudflared 2026.10.3
 
 k3s v1.33.4+k3s1
 k3s v1.34.3+k3s1
+k3s v1.37.1+k3s1
 
 aide 0.19.2
 
-helm v4.0.4
+helm v4.3.1
